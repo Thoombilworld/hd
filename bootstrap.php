@@ -2,6 +2,10 @@
 session_start();
 require __DIR__ . '/config/config.php';
 
+if (!defined('HS_ROOT')) {
+    define('HS_ROOT', __DIR__);
+}
+
 if (!defined('HS_INSTALLED') || !HS_INSTALLED) {
     http_response_code(503);
     echo "<h2 style=\"font-family:system-ui,sans-serif; text-align:center; margin-top:32px;\">Application not installed</h2>";
@@ -266,6 +270,40 @@ function hs_settings($force_reload = false)
     }
 
     return $settings;
+}
+
+function hs_theme_service(): Theme
+{
+    static $service = null;
+    if ($service === null) {
+        if (!class_exists('Theme') && file_exists(__DIR__ . '/core/Theme.php')) {
+            require __DIR__ . '/core/Theme.php';
+        }
+        $service = new Theme(__DIR__ . '/themes');
+    }
+    return $service;
+}
+
+function hs_active_theme(): array
+{
+    return hs_theme_service()->getActiveTheme();
+}
+
+function hs_active_theme_settings(): array
+{
+    $theme = hs_active_theme();
+    return hs_theme_service()->loadThemeSettings($theme['folder'] ?? '');
+}
+
+function hs_theme_custom_css_tag(): string
+{
+    $theme = hs_active_theme();
+    $customCss = '/themes/' . ($theme['folder'] ?? '') . '/assets/css/custom-generated.css';
+    $path = __DIR__ . $customCss;
+    if (is_readable($path)) {
+        return '<link rel="stylesheet" href="' . hs_base_url(trim($customCss, '/')) . '?v=' . filemtime($path) . '">';
+    }
+    return '';
 }
 
 function hs_home_layout(array $settings)
