@@ -280,6 +280,7 @@ if (!empty($post['image_main'])) {
     .nav-search input[type="text"]::placeholder { color:#9CA3AF; }
     .nav-search button { display:none; }
     .language-switcher { min-width:120px; padding:6px 10px; border-radius:10px; border:1px solid rgba(148,163,184,0.5); background:#0B1120; color:#E5E7EB; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
     .user-bar { font-size:11px; color:#E5E7EB; text-align:right; }
     .user-bar a { color:#FACC15; }
@@ -418,12 +419,15 @@ if (!empty($post['image_main'])) {
     .article-nav a { display:block; background:#0F172A; color:#E5E7EB; padding:10px 12px; border-radius:12px; border:1px solid rgba(15,23,42,0.25); box-shadow:0 10px 32px rgba(15,23,42,0.25); width:100%; }
     .article-nav a:hover { background:#111827; text-decoration:none; color:#FACC15; }
 
-    .comment-block { margin-top:18px; padding:14px; background:#F8FAFC; border-radius:14px; border:1px solid #E5E7EB; }
-    .comment-title { font-size:14px; font-weight:800; margin-bottom:8px; color:#0F172A; }
-    .comment-note { font-size:12px; color:#6B7280; margin-bottom:10px; }
-    .comment-field { width:100%; min-height:120px; border-radius:12px; border:1px solid #E5E7EB; padding:10px; font-size:14px; box-sizing:border-box; }
-    .comment-action { margin-top:10px; display:flex; justify-content:flex-end; }
-    .comment-action button { background:#1D4ED8; color:#FFF; border:none; padding:10px 14px; border-radius:10px; font-weight:700; cursor:not-allowed; opacity:.7; }
+    .comment-block { margin-top:18px; padding:16px; background:#0B1221; border-radius:14px; border:1px solid rgba(148,163,184,0.28); box-shadow:0 18px 40px rgba(0,0,0,0.18); color:#E5E7EB; }
+    .comment-title { font-size:14px; font-weight:800; margin-bottom:8px; color:#FACC15; text-transform:uppercase; letter-spacing:.12em; }
+    .comment-note { font-size:12px; color:#CBD5E1; margin-bottom:8px; }
+    .comment-meta { font-size:12px; color:#94A3B8; margin:6px 0 10px; display:flex; align-items:center; gap:6px; }
+    .comment-field { width:100%; min-height:130px; border-radius:12px; border:1px solid rgba(148,163,184,0.35); padding:12px; font-size:14px; box-sizing:border-box; background:rgba(15,23,42,0.65); color:#E5E7EB; }
+    .comment-field::placeholder { color:#94A3B8; }
+    .comment-actions { margin-top:10px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; }
+    .comment-actions button { background:#1D4ED8; color:#FFF; border:none; padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer; box-shadow:0 10px 28px rgba(37,99,235,0.35); }
+    .comment-actions a { display:inline-flex; align-items:center; gap:6px; padding:10px 12px; border-radius:10px; background:rgba(148,163,184,0.16); color:#E5E7EB; text-decoration:none; border:1px solid rgba(148,163,184,0.3); }
 
     .sidebar {
       display:flex;
@@ -645,9 +649,16 @@ if (!empty($post['image_main'])) {
 
         <div class="comment-block" aria-live="polite">
           <div class="comment-title"><?= htmlspecialchars(hs_t('comments_title', 'Comments')) ?></div>
-          <div class="comment-note"><?= htmlspecialchars(hs_t('comments_note', 'Optional section — wire up your preferred provider or enable native comments.')) ?></div>
-          <textarea class="comment-field" placeholder="<?= htmlspecialchars(hs_t('comments_placeholder', 'Share your thoughts (coming soon)...')) ?>" disabled></textarea>
-          <div class="comment-action"><button type="button" disabled><?= htmlspecialchars(hs_t('comments_submit', 'Post Comment')) ?></button></div>
+          <div class="comment-note"><?= htmlspecialchars(hs_t('comments_note', 'Comments are moderated. Until live threads are enabled, send your note to the newsroom.')) ?></div>
+          <form class="comment-form">
+            <label class="sr-only" for="comment_input">Comment</label>
+            <textarea id="comment_input" class="comment-field" name="comment" placeholder="<?= htmlspecialchars(hs_t('comments_placeholder', 'Share your feedback with the newsroom…')) ?>" aria-describedby="comment_meta"></textarea>
+            <div id="comment_meta" class="comment-meta">💬 <?= htmlspecialchars(hs_t('comments_meta', 'Your note is packaged with this article link and opened in the contact desk.')) ?></div>
+            <div class="comment-actions">
+              <button type="submit" aria-label="Send via contact desk"><?= htmlspecialchars(hs_t('comments_submit', 'Send feedback')) ?></button>
+              <a href="<?= hs_base_url('contact.php') ?>" class="comment-link">✉ <?= htmlspecialchars(hs_t('comments_contact', 'Open contact page')) ?></a>
+            </div>
+          </form>
         </div>
       </div>
     </article>
@@ -693,6 +704,22 @@ if (!empty($post['image_main'])) {
     navToggle.addEventListener('click', () => {
       const isOpen = headerEl.classList.toggle('nav-open');
       navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  }
+
+  const commentForm = document.querySelector('.comment-form');
+  if (commentForm) {
+    commentForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const text = (commentForm.querySelector('.comment-field')?.value || '').trim();
+      const contactUrl = new URL('<?= hs_base_url('contact.php') ?>');
+      if (text) {
+        contactUrl.searchParams.set('subject', 'Article feedback');
+        contactUrl.searchParams.set('note', text.slice(0, 800));
+      }
+      contactUrl.searchParams.set('from_article', '<?= $post['slug'] ?? '' ?>');
+      contactUrl.searchParams.set('source', 'comments-disabled');
+      window.location.href = contactUrl.toString();
     });
   }
 </script>
