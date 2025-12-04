@@ -1,0 +1,19 @@
+/* Lightweight inline editor styles (local, CDN-free) */
+.hs-summernote-wrapper{border:1px solid #d0d7de;border-radius:8px;background:#fff;font-family:'Inter',system-ui,-apple-system,sans-serif;}
+.hs-summernote-wrapper.dark{background:#0f172a;border-color:#1f2937;color:#e5e7eb;}
+.hs-summernote-toolbar{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border-bottom:1px solid #e2e8f0;background:#f8fafc;border-radius:8px 8px 0 0;}
+.hs-summernote-wrapper.dark .hs-summernote-toolbar{background:#111827;border-color:#1f2937;}
+.hs-summernote-btn{border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer;transition:all .15s ease;color:#0f172a;}
+.hs-summernote-btn:hover{background:#0ea5e9;border-color:#0284c7;color:#fff;}
+.hs-summernote-wrapper.dark .hs-summernote-btn{background:#0f172a;border-color:#1f2937;color:#e5e7eb;}
+.hs-summernote-wrapper.dark .hs-summernote-btn:hover{background:#0284c7;border-color:#0ea5e9;color:#fff;}
+.hs-summernote-editor{min-height:240px;max-height:800px;overflow:auto;padding:14px;font-size:15px;line-height:1.7;background:#fff;color:#0f172a;border-radius:0 0 8px 8px;}
+.hs-summernote-wrapper.dark .hs-summernote-editor{background:#0f172a;color:#e5e7eb;}
+.hs-summernote-editor:focus{outline:none;box-shadow:0 0 0 2px rgba(14,165,233,0.4);}
+.hs-summernote-editor img{max-width:100%;height:auto;border-radius:8px;}
+.hs-summernote-editor blockquote{border-left:3px solid #0ea5e9;padding-left:10px;color:#475569;}
+.hs-summernote-code{font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:13px;white-space:pre-wrap;}
+.hs-summernote-status{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 10px;color:#64748b;border-top:1px solid #e2e8f0;background:#f8fafc;border-radius:0 0 8px 8px;}
+.hs-summernote-wrapper.dark .hs-summernote-status{background:#0b1220;border-color:#1f2937;color:#cbd5e1;}
+.hs-summernote-toggle{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#0f172a;}
+.hs-summernote-wrapper.dark .hs-summernote-toggle{color:#cbd5e1;}
