@@ -1,0 +1,11 @@
+<h2>India Focus</h2>
+<div class="hero-grid">
+<?php foreach ($india as $post): ?>
+    <article class="card">
+        <?php if (!empty($post['image_main'])): ?>
+            <img src="<?php echo HS_Helpers::esc($post['image_main']); ?>" alt="<?php echo HS_Helpers::esc($post['title']); ?>">
+        <?php endif; ?>
+        <h3><a href="<?php echo hs_news_url($post['slug']); ?>"><?php echo HS_Helpers::esc($post['title']); ?></a></h3>
+    </article>
+<?php endforeach; ?>
+</div>

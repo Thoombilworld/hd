@@ -1,0 +1,6 @@
+/* Dark mode helpers for lightweight editor */
+.hs-summernote-wrapper.dark .hs-summernote-editor{background:#0f172a;color:#e5e7eb;}
+.hs-summernote-wrapper.dark .hs-summernote-toolbar{background:#111827;border-color:#1f2937;}
+.hs-summernote-wrapper.dark .hs-summernote-btn{background:#0f172a;border-color:#1f2937;color:#e5e7eb;}
+.hs-summernote-wrapper.dark .hs-summernote-btn:hover{background:#0284c7;border-color:#0ea5e9;color:#fff;}
+.hs-summernote-wrapper.dark .hs-summernote-status{background:#0b1220;border-color:#1f2937;color:#cbd5e1;}
