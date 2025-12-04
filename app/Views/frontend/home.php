@@ -462,7 +462,8 @@
       background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.94));
     }
     .slider-slide.is-active { opacity:1; position:absolute; }
-    .slider-media img {
+    .slider-link { display:block; height:100%; border-radius:16px; overflow:hidden; }
+    .slider-link img {
       width:100%; height:100%; object-fit:cover;
       border-radius:16px; display:block;
     }
@@ -517,6 +518,7 @@
       overflow:hidden;
       padding:8px;
     }
+    .slider-mini-link { display:block; }
     .slider-mini-card img { width:100%; height:78px; object-fit:cover; border-radius:12px; }
     .slider-mini-placeholder {
       width:100%; height:78px; border-radius:12px;
@@ -1054,11 +1056,13 @@
                 <?php foreach ($slider_posts as $idx => $p): ?>
                   <article class="slider-slide <?= $idx === 0 ? 'is-active' : '' ?>" data-index="<?= $idx ?>">
                     <div class="slider-media">
-                      <?php if (!empty($p['image_main'])): ?>
-                        <img src="<?= hs_base_url($p['image_main']) ?>" alt="<?= htmlspecialchars($p['title']) ?>">
-                      <?php else: ?>
-                        <div class="slider-placeholder"><?= htmlspecialchars(hs_t('featured_placeholder', 'Top Story')) ?></div>
-                      <?php endif; ?>
+                      <a class="slider-link" href="<?= hs_news_url($p['slug']) ?>" aria-label="<?= htmlspecialchars($p['title']) ?>">
+                        <?php if (!empty($p['image_main'])): ?>
+                          <img src="<?= hs_base_url($p['image_main']) ?>" alt="<?= htmlspecialchars($p['title']) ?>">
+                        <?php else: ?>
+                          <div class="slider-placeholder"><?= htmlspecialchars(hs_t('featured_placeholder', 'Top Story')) ?></div>
+                        <?php endif; ?>
+                      </a>
                     </div>
                     <div class="slider-body">
                       <div class="slider-kicker">
@@ -1092,11 +1096,13 @@
                 <?php foreach ($slider_mini as $mini): ?>
                   <article class="slider-mini-card">
                     <div>
-                      <?php if (!empty($mini['image_main'])): ?>
-                        <img src="<?= hs_base_url($mini['image_main']) ?>" alt="<?= htmlspecialchars($mini['title']) ?>">
-                      <?php else: ?>
-                        <div class="slider-mini-placeholder">News</div>
-                      <?php endif; ?>
+                      <a class="slider-mini-link" href="<?= hs_news_url($mini['slug']) ?>" aria-label="<?= htmlspecialchars($mini['title']) ?>">
+                        <?php if (!empty($mini['image_main'])): ?>
+                          <img src="<?= hs_base_url($mini['image_main']) ?>" alt="<?= htmlspecialchars($mini['title']) ?>">
+                        <?php else: ?>
+                          <div class="slider-mini-placeholder">News</div>
+                        <?php endif; ?>
+                      </a>
                     </div>
                     <div>
                       <div class="slider-mini-meta"><?= htmlspecialchars($mini['category_name'] ?: hs_t('featured_category_placeholder', 'News')) ?></div>
