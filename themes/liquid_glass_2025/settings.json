@@ -1,0 +1,38 @@
+{
+  "palette": {
+    "primary": "#1e88ff",
+    "secondary": "#6ee7ff",
+    "background": "#f7fbff",
+    "glass": "rgba(255, 255, 255, 0.78)",
+    "text": "#0f172a",
+    "muted": "#475569",
+    "neon": "#5ef0ff",
+    "dark": "#0b1220"
+  },
+  "typography": {
+    "font_family": "'InterVariable', 'Inter', system-ui, -apple-system, sans-serif",
+    "base_size": "16px",
+    "weight": 500,
+    "line_height": 1.6,
+    "scale": 1.08
+  },
+  "layout": {
+    "container": "1200px",
+    "grid_gap": "24px",
+    "card_radius": "20px",
+    "glass_blur": "16px",
+    "header_style": "glass-top",
+    "footer_columns": 4
+  },
+  "modes": {
+    "auto": true,
+    "glass": true,
+    "neumorphic": false,
+    "dark_mode": false
+  },
+  "widgets": [
+    {"area": "hero", "type": "featured-slider", "settings": {"limit": 5}},
+    {"area": "sidebar", "type": "newsletter", "settings": {"title": "Stay Updated"}},
+    {"area": "footer", "type": "links", "settings": {"columns": 4}}
+  ]
+}

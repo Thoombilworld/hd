@@ -1,0 +1,10 @@
+{
+  "name": "Liquid Glass 2025",
+  "folder": "liquid_glass_2025",
+  "version": "1.0.0",
+  "author": "NEWS HDSPTV Core",
+  "description": "Futuristic glassmorphic newsroom experience with adaptive color engine and modular layout presets.",
+  "screenshot": "assets/css/screenshot.png",
+  "is_pro": true,
+  "has_customizer": true
+}
