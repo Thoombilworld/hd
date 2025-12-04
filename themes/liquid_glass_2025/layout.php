@@ -1,6 +1,10 @@
 <?php
 $seo = HS_SEO::meta($meta ?? []);
-?><!DOCTYPE html>
+$settings = hs_settings();
+$palette = hs_theme_palette(hs_current_theme());
+$navItems = hs_primary_nav_items();
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -14,20 +18,67 @@ $seo = HS_SEO::meta($meta ?? []);
     <link rel="stylesheet" href="<?php echo HS_THEME_URL; ?>assets/css/style.css">
 </head>
 <body class="glass">
-<header class="site-header">
-    <div class="brand">HDSPTV</div>
-    <nav class="nav">
-        <a href="<?php echo HS_BASE_URL; ?>">Home</a>
-        <a href="<?php echo hs_category_url('india'); ?>">India</a>
-        <a href="<?php echo hs_category_url('kerala'); ?>">Kerala</a>
-        <a href="<?php echo hs_category_url('world'); ?>">World</a>
-    </nav>
-</header>
-<main>
-    <?php include $view; ?>
-</main>
-<footer class="site-footer">
-    <p>© <?php echo date('Y'); ?> HDSPTV News</p>
-</footer>
+<div class="page-shell">
+    <header class="site-header">
+        <div class="top-meta">
+            <div class="brand">
+                <div class="logo">HD</div>
+                <div class="brand-copy">
+                    <strong>HDSPTV</strong>
+                    <span><?php echo HS_Helpers::esc($settings['tagline'] ?? 'Global • India • Kerala'); ?></span>
+                </div>
+            </div>
+            <div class="meta-actions">
+                <span class="meta-chip">Live Updates</span>
+                <span class="meta-chip"><?php echo date('l, M j, Y'); ?></span>
+                <div class="search-box">
+                    <form action="<?php echo hs_search_url(); ?>" method="get">
+                        <input type="text" name="q" placeholder="Search news, teams, topics..." aria-label="Search">
+                        <button type="submit">Go</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <nav class="main-nav">
+            <?php foreach ($navItems as $item): ?>
+                <a href="<?php echo HS_Helpers::esc($item['url']); ?>" class="nav-pill"><?php echo HS_Helpers::esc($item['label']); ?></a>
+            <?php endforeach; ?>
+        </nav>
+    </header>
+
+    <main class="page-main">
+        <?php include $view; ?>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-meta">
+            <div>
+                <strong>HDSPTV</strong> — Worldwide, India, Kerala & Malayalam stories with depth.
+            </div>
+            <div class="footer-links">
+                <a href="<?php echo hs_base_url('privacy.php'); ?>">Privacy</a>
+                <a href="<?php echo hs_base_url('terms.php'); ?>">Terms</a>
+                <a href="<?php echo hs_base_url('contact.php'); ?>">Contact</a>
+            </div>
+        </div>
+        <p>© <?php echo date('Y'); ?> HDSPTV News Network.</p>
+    </footer>
+</div>
+<script>
+(function(){
+    const slides = Array.from(document.querySelectorAll('[data-hero-slide]'));
+    const thumbs = Array.from(document.querySelectorAll('[data-hero-thumb]'));
+    function activate(idx){
+        slides.forEach(s => s.classList.toggle('active', s.dataset.heroSlide === String(idx)));
+        thumbs.forEach(t => t.classList.toggle('active', t.dataset.heroThumb === String(idx)));
+    }
+    thumbs.forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            activate(btn.dataset.heroThumb);
+        });
+    });
+})();
+</script>
 </body>
 </html>
