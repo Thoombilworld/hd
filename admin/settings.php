@@ -14,6 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $favicon = trim($_POST['favicon'] ?? '');
     $theme = strtolower(trim($_POST['theme'] ?? 'dark'));
     $default_language = strtolower(trim($_POST['default_language'] ?? ''));
+    $contact_email = trim($_POST['contact_email'] ?? '');
+    $timezone = trim($_POST['timezone'] ?? 'UTC');
+    $cdn = trim($_POST['cdn_url'] ?? '');
     if (!in_array($theme, ['light', 'dark'], true)) {
         $theme = 'dark';
     }
@@ -28,6 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'theme'      => $theme,
         'favicon'    => $favicon,
         'default_language' => $default_language,
+        'contact_email' => $contact_email,
+        'timezone' => $timezone,
+        'cdn_url' => $cdn,
     ];
 
     foreach ($pairs as $key => $value) {
@@ -96,6 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label for="favicon">Favicon URL</label>
           <input id="favicon" type="text" name="favicon" value="<?= htmlspecialchars($settings['favicon'] ?? '') ?>" placeholder="assets/images/favicon.png">
           <small>Displayed in browser tabs and bookmarks.</small>
+          <br><br>
+          <label for="contact_email">Contact email</label>
+          <input id="contact_email" type="email" name="contact_email" value="<?= htmlspecialchars($settings['contact_email'] ?? '') ?>" placeholder="editor@hdsptv.com">
+          <small>Published in contact page footers and meta tags.</small>
         </section>
 
         <section class="panel">
@@ -114,6 +124,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endforeach; ?>
           </select>
           <small>Applies to the language selector and page lang attributes for SEO.</small>
+          <br><br>
+          <label for="timezone">Timezone</label>
+          <input id="timezone" type="text" name="timezone" value="<?= htmlspecialchars($settings['timezone'] ?? 'UTC') ?>" placeholder="Asia/Kolkata">
+          <small>Used when rendering datelines and scheduling content.</small>
+          <br><br>
+          <label for="cdn">CDN Base URL</label>
+          <input id="cdn" type="text" name="cdn_url" value="<?= htmlspecialchars($settings['cdn_url'] ?? '') ?>" placeholder="https://cdn.hdsptv.com/">
+          <small>Static assets will use this prefix when configured.</small>
         </section>
       </div>
       <div style="margin-top:12px;">

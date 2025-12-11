@@ -6,10 +6,33 @@ class Theme
 {
     private string $themesPath;
     private ?array $activeTheme = null;
+    private $db;
 
     public function __construct(string $themesPath)
     {
         $this->themesPath = rtrim($themesPath, '/');
+        $this->db = function_exists('hs_db') ? hs_db() : null;
+        $this->ensureThemeTable();
+    }
+
+    private function ensureThemeTable(): void
+    {
+        if (!$this->db) {
+            return;
+        }
+        $sql = "CREATE TABLE IF NOT EXISTS hs_themes (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            theme_name VARCHAR(150) NOT NULL,
+            theme_folder VARCHAR(150) NOT NULL UNIQUE,
+            version VARCHAR(50) NULL,
+            author VARCHAR(100) NULL,
+            screenshot VARCHAR(255) NULL,
+            is_pro TINYINT(1) NOT NULL DEFAULT 0,
+            has_customizer TINYINT(1) NOT NULL DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+        mysqli_query($this->db, $sql);
     }
 
     public function getActiveTheme(): array
@@ -18,7 +41,7 @@ class Theme
             return $this->activeTheme;
         }
 
-        $db = function_exists('hs_db') ? hs_db() : null;
+        $db = $this->db;
         $activeFolder = null;
         if ($db) {
             $result = mysqli_query($db, "SELECT option_value FROM hs_settings WHERE option_key='theme_active' LIMIT 1");
@@ -61,6 +84,7 @@ class Theme
                 $themes[] = $info;
             }
         }
+        $this->syncThemesToDb($themes);
         return $themes;
     }
 
@@ -71,7 +95,7 @@ class Theme
             return false;
         }
 
-        $db = function_exists('hs_db') ? hs_db() : null;
+        $db = $this->db;
         if ($db) {
             $folderEsc = mysqli_real_escape_string($db, $folder);
             $upsert = "INSERT INTO hs_settings(option_key, option_value) VALUES('theme_active', '{$folderEsc}') "
@@ -81,6 +105,8 @@ class Theme
             $legacyUpsert = "INSERT INTO hs_settings(`key`, `value`) VALUES('theme_active', '{$folderEsc}') "
                 . "ON DUPLICATE KEY UPDATE `value`='{$folderEsc}'";
             mysqli_query($db, $legacyUpsert);
+
+            $this->registerThemeRecord($info);
         }
         $this->activeTheme = $info;
         return true;
@@ -110,6 +136,44 @@ class Theme
         }
         $encoded = json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         return (bool)file_put_contents($settingsFile, $encoded);
+    }
+
+    public function getThemeRecords(): array
+    {
+        if (!$this->db) {
+            return [];
+        }
+        $res = mysqli_query($this->db, "SELECT * FROM hs_themes ORDER BY created_at DESC");
+        return $res ? mysqli_fetch_all($res, MYSQLI_ASSOC) : [];
+    }
+
+    public function syncThemesToDb(array $themes = null): void
+    {
+        if (!$this->db) {
+            return;
+        }
+        $themes = $themes ?? $this->getThemes();
+        foreach ($themes as $theme) {
+            $this->registerThemeRecord($theme);
+        }
+    }
+
+    private function registerThemeRecord(array $theme): void
+    {
+        if (!$this->db) {
+            return;
+        }
+        $stmt = mysqli_prepare($this->db, "INSERT INTO hs_themes(theme_name, theme_folder, version, author, screenshot, is_pro, has_customizer)
+            VALUES(?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE theme_name=VALUES(theme_name), version=VALUES(version), author=VALUES(author), screenshot=VALUES(screenshot), is_pro=VALUES(is_pro), has_customizer=VALUES(has_customizer)");
+        $name = $theme['name'] ?? ($theme['folder'] ?? '');
+        $folder = $theme['folder'] ?? '';
+        $version = $theme['version'] ?? '';
+        $author = $theme['author'] ?? '';
+        $shot = $theme['screenshot'] ?? '';
+        $isPro = !empty($theme['is_pro']) ? 1 : 0;
+        $custom = !empty($theme['has_customizer']) ? 1 : 0;
+        mysqli_stmt_bind_param($stmt, 'ssssiii', $name, $folder, $version, $author, $shot, $isPro, $custom);
+        mysqli_stmt_execute($stmt);
     }
 
     private function loadThemeInfo(string $folder): ?array

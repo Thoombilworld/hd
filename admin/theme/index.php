@@ -8,6 +8,7 @@ $themeService = new Theme(HS_ROOT . '/themes');
 $colorEngine = new ColorEngine();
 $themes = $themeService->getThemes();
 $active = $themeService->getActiveTheme();
+$registry = $themeService->getThemeRecords();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['activate'])) {
     $folder = trim($_POST['activate']);
@@ -15,6 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['activate'])) {
         header('Location: index.php?status=activated');
         exit;
     }
+}
+
+if (isset($_GET['sync']) && $_GET['sync'] === '1') {
+    $themeService->syncThemesToDb($themes);
+    header('Location: index.php?status=synced');
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -35,16 +42,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['activate'])) {
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1">Theme Manager</h1>
-            <p class="text-muted mb-0">Activate, preview, and customize next-gen themes.</p>
+            <p class="text-muted mb-0">Activate, preview, and customize next-gen themes. Sync filesystem themes into the registry.</p>
         </div>
-        <a class="btn btn-primary" href="editor.php?theme=<?= urlencode($active['folder'] ?? ''); ?>">Open Customizer</a>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="?sync=1">Sync &amp; Register</a>
+            <a class="btn btn-primary" href="editor.php?theme=<?= urlencode($active['folder'] ?? ''); ?>">Open Customizer</a>
+        </div>
     </div>
 
     <?php if (isset($_GET['status']) && $_GET['status']==='activated'): ?>
         <div class="alert alert-success">Theme activated successfully.</div>
+    <?php elseif (isset($_GET['status']) && $_GET['status']==='synced'): ?>
+        <div class="alert alert-info">Filesystem themes synced into registry.</div>
     <?php endif; ?>
 
-    <div class="row g-3">
+    <div class="row g-3 mb-4">
         <?php foreach ($themes as $theme): ?>
             <div class="col-md-4">
                 <div class="theme-card">
@@ -73,6 +85,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['activate'])) {
                 </div>
             </div>
         <?php endforeach; ?>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="h5 mb-1">Registered Themes</h2>
+                    <p class="text-muted mb-0">Multi-theme registry with version, author, and install timestamps.</p>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr><th>Folder</th><th>Name</th><th>Version</th><th>Author</th><th>PRO</th><th>Customizer</th><th>Created</th><th>Updated</th></tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($registry as $row): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($row['theme_folder']); ?></td>
+                                <td><?= htmlspecialchars($row['theme_name']); ?></td>
+                                <td><?= htmlspecialchars($row['version']); ?></td>
+                                <td><?= htmlspecialchars($row['author']); ?></td>
+                                <td><?= !empty($row['is_pro']) ? 'Yes' : 'No'; ?></td>
+                                <td><?= !empty($row['has_customizer']) ? 'Yes' : 'No'; ?></td>
+                                <td><?= htmlspecialchars($row['created_at']); ?></td>
+                                <td><?= htmlspecialchars($row['updated_at']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </body>
 </html>

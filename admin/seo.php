@@ -11,6 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $og_article = $_POST['default_article_og_image'] ?? '';
     $schema_on  = !empty($_POST['seo_schema_enabled']) ? '1' : '0';
     $author_def = $_POST['seo_default_author'] ?? '';
+    $title_fmt  = $_POST['seo_title_format'] ?? '{title} | NEWS HDSPTV';
+    $robots     = $_POST['seo_robots'] ?? 'index,follow';
+    $sitemap    = $_POST['seo_sitemap_url'] ?? '';
+    $canonical  = $_POST['seo_canonical_base'] ?? '';
 
     $db = hs_db();
     $pairs = [
@@ -20,6 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'default_article_og_image' => $og_article,
         'seo_schema_enabled'       => $schema_on,
         'seo_default_author'       => $author_def,
+        'seo_title_format'         => $title_fmt,
+        'seo_robots'               => $robots,
+        'seo_sitemap_url'          => $sitemap,
+        'seo_canonical_base'       => $canonical,
     ];
     foreach ($pairs as $k => $v) {
         $stmt = mysqli_prepare($db, "INSERT INTO hs_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
@@ -40,14 +48,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body style="max-width:820px;margin:20px auto;padding:0 16px;">
   <h1>SEO Settings</h1>
-  <?php if ($msg): ?><div style="color:green;"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
+  <?php if ($msg): ?><div style="color:green;" role="status"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
   <form method="post">
     <h2>Global Meta</h2>
     <label>Meta Description</label><br>
-    <textarea name="seo_meta_description" style="width:100%;height:80px;"><?= htmlspecialchars($settings['seo_meta_description'] ?? '') ?></textarea><br><br>
+    <textarea name="seo_meta_description" style="width:100%;height:80px;" required><?= htmlspecialchars($settings['seo_meta_description'] ?? '') ?></textarea><br><br>
 
     <label>Meta Keywords (comma separated)</label><br>
-    <textarea name="seo_meta_keywords" style="width:100%;height:60px;"><?= htmlspecialchars($settings['seo_meta_keywords'] ?? '') ?></textarea><br><br>
+    <textarea name="seo_meta_keywords" style="width:100%;height:60px;" required><?= htmlspecialchars($settings['seo_meta_keywords'] ?? '') ?></textarea><br><br>
+
+    <label>Title Format</label><br>
+    <input type="text" name="seo_title_format" style="width:100%;" value="<?= htmlspecialchars($settings['seo_title_format'] ?? '{title} | NEWS HDSPTV') ?>" placeholder="{title} | NEWS HDSPTV"><br>
+    <small>Use placeholders: {title}, {site}, {category}.</small><br><br>
+
+    <h2>Robots &amp; Canonical</h2>
+    <label>Robots Policy</label><br>
+    <input type="text" name="seo_robots" style="width:100%;" value="<?= htmlspecialchars($settings['seo_robots'] ?? 'index,follow') ?>"><br>
+    <label>Canonical Base URL</label><br>
+    <input type="text" name="seo_canonical_base" style="width:100%;" value="<?= htmlspecialchars($settings['seo_canonical_base'] ?? HS_BASE_URL) ?>"><br>
+    <label>XML Sitemap URL</label><br>
+    <input type="text" name="seo_sitemap_url" style="width:100%;" value="<?= htmlspecialchars($settings['seo_sitemap_url'] ?? '') ?>"><br><br>
 
     <h2>OpenGraph / Social</h2>
     <label>Homepage OG Image URL</label><br>
